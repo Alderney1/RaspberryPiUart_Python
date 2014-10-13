@@ -116,37 +116,33 @@ class Uart(object):
             Set the new name of the name.
             """
             self._name = name
-           
-    def __init__(self,name=None):
-        """
-        Initilize the uart class with given parameters.
-        Inputs: 
-        """
-        self._name = name
-
-    def openinit__(self,name=None,name_rec=None,port=None,baudrate=None,bitsize=None,parity=None,startbit=None,data_length=None,stopbit=None):
-        """
-        Initilize the uart class with given parameters.
-        Inputs: 
-        """
-        self._name = name # name of this device for the connection
-        self._name_rec = name_rec # name of the reciver for the connection
-        self._port = port # Device name or port number number or None of the connection.
-        self._baudrate = baudrate # Baud rate such as 9600 or 115200 etc.
-        self._bytesize = bitesize # Number of data bits. Possible values: FIVEBITS, SIXBITS, SEVENBITS, EIGHTBITS.
-        self._parity = parity # Enable parity checking. Possible values: PARITY_NONE, PARITY_EVEN, PARITY_ODD PARITY_MARK, PARITY_SPACE
-        self._stopbit = stopbit # stopbits – Number of stop bits. Possible values: STOPBITS_ONE, STOPBITS_ONE_POINT_FIVE, STOPBITS_TWO.
-        self._timeout = timeout # Set a read timeout value.
-        self._data_length = data_length
-        self._xonxoff = xonxoff # Enable software flow control.
-        self._rtscts = rtscts #  Enable hardware (RTS/CTS) flow control.
-        self._dsrdtr = dsrdtr # Enable hardware (DSR/DTR) flow control.
-        self._writeTimeout = writeTimeout # Set a write timeout value.
-        self._interCharTimeout = interCharTimeout # Inter-character timeout, None to disable (default).
+    def __init__(self,**kwargs):
         
-        global serial
-        serial = serialport = serial.Serial(port="/dev/ttyS0",baudrate=self._baudrate,bytesize=self._bytesize,parity=self._parity,stopbits=self._stopbits,timeout=self._timeout,xonxoff=self._xonxoff,rtscts=self._rtscts,dsrdtr=self._dsrdtr, writeTimeout=self._writetimeout,interCharTimeout=self._interchartimeout)
+        r = self.serial_ports()
+        print(r)
+        print('rrrrr')
+        self._name = kwargs.get('name','Uart') # name of this device for the connection
+        self._name_rec = kwargs.get('name_rec','UNVALID') # name of the reciver for the connection
 
+         
+        self._port = kwargs.get('port','UNVALID') # Device name or port number number or None of the connection.
+        self._baudrate = kwargs.get('baudrate','UNVALID') # Baud rate such as 9600 or 115200 etc.
+        self._bytesize = kwargs.get('bytesize',serial.EIGHTBITS) # Number of data bits. Possible values: FIVEBITS, SIXBITS, SEVENBITS, EIGHTBITS.
+        self._parity = kwargs.get('parity',serial.PARITY_NONE) # Enable parity checking. Possible values: PARITY_NONE, PARITY_EVEN, PARITY_ODD PARITY_MARK, PARITY_SPACE
+        self._stopbit = kwargs.get('stopbit',serial.STOPBITS_ONE) # stopbits – Number of stop bits. Possible values: STOPBITS_ONE, STOPBITS_ONE_POINT_FIVE, STOPBITS_TWO.
+        self._timeout = kwargs.get('timeout',5) # Set a read timeout value.
+        self._xonxoff = kwargs.get('xonxoff',serial.XON) # Enable software flow control.
+        self._rtscts = kwargs.get('rtscts',serial.XOFF) #  Enable hardware (RTS/CTS) flow control.
+        self._dsrdtr = kwargs.get('dsrdtr',serial.XOFF) # Enable hardware (DSR/DTR) flow control.
+        self._writetimeout = kwargs.get('writeTimeout',5) # Set a write timeout value.
+        self._interchartimeout = kwargs.get('interCharTimeout',5) # Inter-character timeout, None to disable (default).
+        
+        global ser
+        ser = serial.Serial(port="/dev/ttyAMA0",baudrate=self._baudrate,bytesize=self._bytesize,parity=self._parity,stopbits=self._stopbit,timeout=self._timeout,xonxoff=self._xonxoff,rtscts=self._rtscts,dsrdtr=self._dsrdtr, writeTimeout=self._writetimeout,interCharTimeout=self._interchartimeout)
+        #ser.open()
+        ser.write("aaaaaaa".encode('utf-8'))
+        a = ser.read()
+        print(a)
     def close_uart(self):
         """
         Close the uart connnection.
