@@ -76,8 +76,11 @@ class Uart(object):
             """
             Is the main loop for the thread, to listen/observer over the uart connection.
             """
+            while(1):
+                data = ser.read()
+                print(data)
             
-    class transmitter(object):
+    class Transmitter(object):
         """
         Class to transmit data over a existing uart connection.
         """
@@ -95,7 +98,7 @@ class Uart(object):
             Inputs->
             Data : : Data is the transitted data.
             """
-            bytes_written = serial.write(data)
+            bytes_written = ser.write(bytes(data,'UTF-8'))
             self._number_data += 1
             return bytes_written
 
@@ -116,6 +119,7 @@ class Uart(object):
             Set the new name of the name.
             """
             self._name = name
+
     def __init__(self,**kwargs):
         
         r = self.serial_ports()
@@ -125,24 +129,32 @@ class Uart(object):
         self._name_rec = kwargs.get('name_rec','UNVALID') # name of the reciver for the connection
 
          
-        self._port = kwargs.get('port','UNVALID') # Device name or port number number or None of the connection.
-        self._baudrate = kwargs.get('baudrate','UNVALID') # Baud rate such as 9600 or 115200 etc.
+        self._port = kwargs.get('port','/dev/ttyAMA0') # Device name or port number number or None of the connection.
+        self._baudrate = kwargs.get('baudrate',9600) # Baud rate such as 9600 or 115200 etc.
         self._bytesize = kwargs.get('bytesize',serial.EIGHTBITS) # Number of data bits. Possible values: FIVEBITS, SIXBITS, SEVENBITS, EIGHTBITS.
         self._parity = kwargs.get('parity',serial.PARITY_NONE) # Enable parity checking. Possible values: PARITY_NONE, PARITY_EVEN, PARITY_ODD PARITY_MARK, PARITY_SPACE
         self._stopbit = kwargs.get('stopbit',serial.STOPBITS_ONE) # stopbits – Number of stop bits. Possible values: STOPBITS_ONE, STOPBITS_ONE_POINT_FIVE, STOPBITS_TWO.
         self._timeout = kwargs.get('timeout',5) # Set a read timeout value.
-        self._xonxoff = kwargs.get('xonxoff',serial.XON) # Enable software flow control.
-        self._rtscts = kwargs.get('rtscts',serial.XOFF) #  Enable hardware (RTS/CTS) flow control.
+        self._xonxoff = kwargs.get('xonxoff',serial.XOFF) # Enable software flow control.
+        self._rtscts = kwargs.get('rtscts',serial.XON) #  Enable hardware (RTS/CTS) flow control.
         self._dsrdtr = kwargs.get('dsrdtr',serial.XOFF) # Enable hardware (DSR/DTR) flow control.
         self._writetimeout = kwargs.get('writeTimeout',5) # Set a write timeout value.
         self._interchartimeout = kwargs.get('interCharTimeout',5) # Inter-character timeout, None to disable (default).
         
         global ser
-        ser = serial.Serial(port="/dev/ttyAMA0",baudrate=self._baudrate,bytesize=self._bytesize,parity=self._parity,stopbits=self._stopbit,timeout=self._timeout,xonxoff=self._xonxoff,rtscts=self._rtscts,dsrdtr=self._dsrdtr, writeTimeout=self._writetimeout,interCharTimeout=self._interchartimeout)
-        #ser.open()
-        ser.write("aaaaaaa".encode('utf-8'))
-        a = ser.read()
-        print(a)
+        ser = serial.Serial(port=self._port,baudrate=self._baudrate,bytesize=self._bytesize,parity=self._parity,stopbits=self._stopbit,timeout=self._timeout,xonxoff=self._xonxoff,rtscts=self._rtscts,dsrdtr=self._dsrdtr, writeTimeout=self._writetimeout,interCharTimeout=self._interchartimeout)
+        ser.open()
+        #ser.write("aaaaaaa".encode('utf-8'))
+        #a = ser.read()
+        #print(a)
+        self._trans = self.Transmitter(name=self._name + 'Transmitter')
+        self._rev = self.Receiver(name=self._name + 'Reciver')
+    def send_data(self, data):
+        """
+        Send Data
+        """
+        self._trans.send_data(data)
+        
     def close_uart(self):
         """
         Close the uart connnection.
